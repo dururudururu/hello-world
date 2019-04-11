@@ -1,0 +1,39 @@
+library(psych)
+library(lavaan)
+library(ggplot2)
+library(semPlot)
+library(qgraph)
+
+setwd("C:/data/AMOS_CFA_oh/")
+data <- read.csv("rawdata.csv", header = T)
+dat <- data[,1:32]
+cormat<-round(var(dat),3)
+
+efa_3fac <- factanal(dat,3)
+efa_4fac <- factanal(dat,4)
+efa_3fac
+efa_4fac
+
+scree(cormat,pc=F,factors=T)
+
+formula_5fac <- 'AA =~ DAP4+DAP8+DAP13+DAP15+DAP16+DAP25+DAP27+DAP28+DAP31+DAP22
+                 FD =~ DAP1+DAP2+DAP7+DAP18+DAP20+DAP21+DAP32
+                 DA =~ DAP3+DAP10+DAP12+DAP19+DAP26
+                 NeA =~ DAP6+DAP14+DAP17+DAP24+DAP30
+                 EA =~ DAP5+DAP9+DAP11+DAP23+DAP29'
+mod_fac5 <- cfa(formula_5fac, data=dat)
+result_fac5 <- summary(mod_fac5, standardized=T, fit.measure=T)
+
+
+formula_4fac <- 'AA =~ DAP4+DAP8+DAP13+DAP15+DAP16+DAP25+DAP27+DAP28+DAP31+DAP22
+                 FD_DA =~ DAP1+DAP2+DAP7+DAP18+DAP20+DAP21+DAP32+DAP26+DAP3+DAP10+DAP12+DAP19
+                 NeA =~ DAP6+DAP14+DAP17+DAP24+DAP30
+                 EA =~ DAP5+DAP9+DAP11+DAP23+DAP29'
+mod_fac4 <- cfa(formula_4fac, data=dat)
+summary(mod_fac4, standardized=T, fit.measure=T)
+
+#png("mod_fac5_print.png", height=1400, width=4000, res=800)
+#dev.off()
+semPlot::semPaths(mod_fac5, what="std", edge.width=.2,  style="lisrel",sizeMan=3, sizeLat=5, title=T,
+                  layout="spring", edge.color = "black", edge.label.cex = .25)
+
